@@ -84,7 +84,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .ck-row.pinned{background:var(--bg-pin)}
 .ck-row.pinned+.ck-row:not(.pinned){border-top:1px solid var(--border)}
 .sub-tab-bar{display:flex;border-bottom:1px solid var(--border);margin:-14px -14px 14px;background:#fff}
-.stab{flex:1;padding:10px 1px;font-size:10px;text-align:center;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;font-weight:500;white-space:nowrap}
+.stab{flex:1;padding:8px 4px;font-size:10px;text-align:center;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;font-weight:500;line-height:1.3;word-break:keep-all}
 .stab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:700}
 .hentry{border-left:3px solid var(--border);padding:9px 11px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--bg-sub);margin-bottom:8px}
 .hentry:last-child{margin-bottom:0}
@@ -319,9 +319,9 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       </div>
       <div class="card" style="padding:0;overflow:hidden">
         <div class="sub-tab-bar">
-          <div class="stab active" onclick="switchSub('injuries')">부상 목록</div>
-          <div class="stab" onclick="switchSub('history')">치료 기록</div>
-          <div class="stab" onclick="switchSub('records')">보고 기록</div>
+          <div class="stab active" onclick="switchSub('injuries')">부상<br>목록</div>
+          <div class="stab" onclick="switchSub('history')">치료<br>기록</div>
+          <div class="stab" onclick="switchSub('records')">보고<br>기록</div>
         </div>
         <!-- 부상 목록 -->
         <div id="sub-injuries" style="padding:14px">
