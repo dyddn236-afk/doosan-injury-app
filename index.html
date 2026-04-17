@@ -84,7 +84,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .ck-row.pinned{background:var(--bg-pin)}
 .ck-row.pinned+.ck-row:not(.pinned){border-top:1px solid var(--border)}
 .sub-tab-bar{display:flex;border-bottom:1px solid var(--border);margin:-14px -14px 14px;background:#fff}
-.stab{flex:1;padding:10px 4px;font-size:11px;text-align:center;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;font-weight:500;white-space:nowrap}
+.stab{flex:1;padding:10px 1px;font-size:10px;text-align:center;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;font-weight:500;white-space:nowrap}
 .stab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:700}
 .hentry{border-left:3px solid var(--border);padding:9px 11px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--bg-sub);margin-bottom:8px}
 .hentry:last-child{margin-bottom:0}
@@ -534,7 +534,7 @@ function getTodayCheckKey(){
 }
 const checkKey=getTodayCheckKey();
 
-document.getElementById('today-label').textContent=today.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'})+(new Date().getHours()<12?' (오전 체크 중)':' (오후 — 내일 체크 준비)');
+document.getElementById('today-label').textContent=today.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
 document.getElementById('s2-date').value=todayStr;
 document.getElementById('ai-date').value=todayStr;
 document.getElementById('s2-mdate').value=todayStr;
@@ -609,19 +609,9 @@ function getTreatments(){return window.getTreatments?window.getTreatments():[]}
 function getDailyReports(){return window.getDailyReports?window.getDailyReports():[]}
 function getTrainers(){return window.getTrainers?window.getTrainers():[]}
 
-// 정오 기준 오늘 보고 필터
+// 24시간 기준 오늘 보고 필터
 function getTodayReports(){
-  const now=new Date();
-  const noon=new Date(now.getFullYear(),now.getMonth(),now.getDate(),12,0,0);
-  const cutoff=new Date(now);
-  // 정오 이후면 정오 이후 보고만, 이전이면 오늘 자정 이후 보고만
-  return getDailyReports().filter(r=>{
-    if(r.date!==todayStr) return false;
-    const ts=r.timestamp?new Date(r.timestamp):null;
-    if(!ts) return true;
-    if(now<noon) return ts<noon; // 오전: 오전 보고만
-    else return ts>=noon; // 오후: 정오 이후 보고만
-  });
+  return getDailyReports().filter(r=>r.date===todayStr);
 }
 
 function renderCheck(){
@@ -650,6 +640,7 @@ function renderCheck(){
           <div>
             <div style="font-size:14px;font-weight:700;color:var(--text)">${p.name}${isPinned?' 📌':''} <span style="font-size:11px;color:var(--text-hint);font-weight:400">${p.pos}</span></div>
             <div style="font-size:12px;color:var(--text-sub);margin-top:2px">${inj?inj.area||inj.symptom||'':''}</div>
+            ${inj&&(inj.detail||inj.mdetail)?'<div style="font-size:11px;color:var(--text-hint);margin-top:3px;line-height:1.5">'+((inj.detail||inj.mdetail).length>45?(inj.detail||inj.mdetail).substring(0,45)+'...':inj.detail||inj.mdetail)+'</div>':''}
           </div>
         </div>
         <span class="badge ${done?'green':'gray'}">${done?'완료':'미완료'}</span>
