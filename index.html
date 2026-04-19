@@ -509,6 +509,8 @@ window.fbUpdateInjury=async(id,d)=>updateDoc(doc(db,'injuries',id),d);
 window.fbAddTx=async(d)=>addDoc(collection(db,'treatments'),d);
 window.fbAddDaily=async(d)=>addDoc(collection(db,'dailyReports'),d);
 window.fbSaveTrainers=async(list)=>setDoc(doc(db,'settings','trainers'),{list});
+window.fbUpdateDoc=async(col,id,d)=>updateDoc(doc(db,col,id),d);
+window.fbDeleteDoc=async(col,id)=>deleteDoc(doc(db,col,id));
 window.getPlayers=()=>players;
 window.getInjuries=()=>injuries;
 window.getTreatments=()=>treatments;
@@ -520,7 +522,7 @@ initListeners();
 
 <script>
 const today=new Date();
-const todayStr=today.toISOString().split('T')[0];
+const todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
 // 정오 체크: 오늘 날짜 + 정오까지만 유효
 function getTodayCheckKey(){
   // 정오 이후면 내일 날짜 키 사용 (오늘 체크 초기화)
@@ -827,6 +829,7 @@ function renderInjuries(){
         <div style="display:flex;gap:6px;align-items:center">
           <span class="badge ${inj.status==='active'?'blue':'gray'}" style="font-size:10px">${inj.status==='active'?'관리 중':'완료'}</span>
           ${inj.status==='active'?`<span style="font-size:11px;color:var(--navy);cursor:pointer;font-weight:700" onclick="closeInj('${inj.id}')">완료 처리</span>`:''}
+          <span style="font-size:11px;color:var(--red);cursor:pointer;font-weight:600" onclick="deleteInj('${inj.id}')">삭제</span>
         </div>
       </div>
       <div style="font-size:12px;color:var(--text-sub);margin-bottom:6px">${inj.date} ${!isMedical?'· '+inj.cause:''}</div>
@@ -843,6 +846,11 @@ function renderInjuries(){
 async function closeInj(injId){
   if(window.fbUpdateInjury) await window.fbUpdateInjury(injId,{status:'closed'});
   toast('부상 완료 처리됐습니다');
+}
+async function deleteInj(injId){
+  if(!confirm('이 부상 기록을 삭제할까요?')) return;
+  if(window.fbDeleteDoc) await window.fbDeleteDoc('injuries',injId);
+  toast('부상 기록 삭제됐습니다');
 }
 function showAddInj(){document.getElementById('add-inj-form').style.display='block';resetAiForm()}
 function hideAddInj(){document.getElementById('add-inj-form').style.display='none'}
@@ -891,9 +899,24 @@ function renderTx(){
   const list=getTreatments().filter(t=>t.pid===curPid).sort((a,b)=>b.date.localeCompare(a.date));
   const colors=['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899'];
   document.getElementById('tx-list').innerHTML=list.length?list.map((t,i)=>`<div class="hentry" style="border-left-color:${colors[i%colors.length]}">
-    <div style="font-size:10px;color:var(--text-hint);margin-bottom:4px;font-weight:600">${t.date}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span style="font-size:10px;color:var(--text-hint);font-weight:600">${t.date}</span>
+      <div style="display:flex;gap:8px">
+        <span style="font-size:11px;color:var(--navy);cursor:pointer;font-weight:600" onclick="editTx('${t.id}','${t.text.replace(/'/g,&quot;&#39;&quot;)}')">수정</span>
+        <span style="font-size:11px;color:var(--red);cursor:pointer;font-weight:600" onclick="deleteTx('${t.id}')">삭제</span>
+      </div>
+    </div>
     <div style="font-size:13px;color:var(--text);line-height:1.6">${t.text}</div>
   </div>`).join(''):'<div class="empty" style="padding:16px 0">치료 기록이 없습니다</div>';
+}
+function editTx(id, text){
+  const newText=prompt('치료 내용 수정', text);
+  if(newText&&newText.trim()&&window.fbUpdateDoc) window.fbUpdateDoc('treatments',id,{text:newText.trim()}).then(()=>toast('치료 기록 수정 완료'));
+}
+async function deleteTx(id){
+  if(!confirm('이 치료 기록을 삭제할까요?')) return;
+  if(window.fbDeleteDoc) await window.fbDeleteDoc('treatments',id);
+  toast('치료 기록 삭제됐습니다');
 }
 async function saveTx(){
   const text=document.getElementById('tx-input').value.trim();
@@ -911,7 +934,10 @@ function renderRecords(){
     return`<div class="dr-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
         <div><span style="font-size:11px;font-weight:700;color:var(--text-sub)">${r.date}</span>${r.trainer?`<span style="font-size:10px;color:var(--text-hint);margin-left:6px">측정: ${r.trainer}</span>`:''}</div>
-        ${r.train>=0?`<span class="badge ${trainCls[r.train]}" style="font-size:10px">${trainLabel[r.train]}</span>`:''}
+        <div style="display:flex;align-items:center;gap:8px">
+          ${r.train>=0?`<span class="badge ${trainCls[r.train]}" style="font-size:10px">${trainLabel[r.train]}</span>`:''}
+          <span style="font-size:11px;color:var(--red);cursor:pointer;font-weight:600" onclick="deleteRecord('${r.id}')">삭제</span>
+        </div>
       </div>
       <div class="row3" style="margin-bottom:${(hasObj||r.note)?'9px':'0'}">
         <div class="mc" style="padding:8px"><div class="ml">현재</div><div class="mv" style="font-size:17px;color:${pc(r.p1)}">${r.p1}</div></div>
@@ -926,6 +952,11 @@ function renderRecords(){
       </div>`:''}
     </div>`;
   }).join('');
+}
+async function deleteRecord(id){
+  if(!confirm('이 보고 기록을 삭제할까요?')) return;
+  if(window.fbDeleteDoc) await window.fbDeleteDoc('dailyReports',id);
+  toast('보고 기록 삭제됐습니다');
 }
 function renderTrainers(){
   const wrap=document.getElementById('trainer-list');
