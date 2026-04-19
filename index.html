@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>두산 부상 관리</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8FAFC;color:#1E293B;font-size:15px;max-width:430px;margin:0 auto;min-height:100vh}
+:root{
+  --navy:#1B3A5C;--green:#166534;--green-bg:#DCFCE7;--green-bd:#86EFAC;
+  --yellow:#854D0E;--yellow-bg:#FEF9C3;--yellow-bd:#FCD34D;
+  --red:#991B1B;--red-bg:#FEE2E2;--red-bd:#FCA5A5;
+  --blue:#1E40AF;--blue-bg:#DBEAFE;
+  --gray:#64748B;--gray-bg:#F1F5F9;--gray-bd:#CBD5E1;
+  --border:#E2E8F0;--text:#1E293B;--text-sub:#64748B;--text-hint:#94A3B8;
+  --bg:#FFFFFF;--bg-sub:#F8FAFC;--bg-pin:#F0F4FF;
+  --radius:12px;--radius-sm:8px;
+}
+.app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--navy);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.topbar h1{font-size:16px;font-weight:700;margin-bottom:2px}
+.topbar p{font-size:11px;opacity:0.7}
+.tab-bar{display:flex;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:99}
+.tab{flex:1;padding:11px 2px;font-size:10px;text-align:center;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;font-weight:500}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:700}
+.screen{display:none;flex-direction:column;gap:12px;padding:14px;flex:1}
+.screen.active{display:flex}
+.sec-label{font-size:11px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:0.06em}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;color:var(--text-sub);margin-bottom:5px;font-weight:600}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;background:#fff;color:var(--text);font-family:inherit;-webkit-appearance:none;outline:none;transition:border-color 0.15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy)}
+.field textarea{resize:none;height:70px;line-height:1.5}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.btn-primary{width:100%;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-primary:active{opacity:0.85}
+.btn-secondary{width:100%;padding:11px;background:var(--bg-sub);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;cursor:pointer;font-family:inherit}
+.btn-outline{width:100%;padding:10px;background:transparent;color:var(--navy);border:1.5px solid var(--navy);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:inherit;font-weight:700}
+.btn-danger{width:100%;padding:10px;background:transparent;color:var(--red);border:1px solid var(--red-bd);border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:inherit;font-weight:600}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge.green{background:var(--green-bg);color:var(--green)}
+.badge.yellow{background:var(--yellow-bg);color:var(--yellow)}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.badge.blue{background:var(--blue-bg);color:var(--blue)}
+.badge.gray{background:var(--gray-bg);color:var(--gray)}
+.badge.purple{background:#EDE9FE;color:#5B21B6}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
+.back-btn{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--navy);cursor:pointer;font-weight:700;padding:4px 0}
+.step-bar{display:flex;gap:4px;margin:4px 0 10px}
+.step-dot{flex:1;height:3px;border-radius:2px;background:var(--border)}
+.step-dot.done{background:var(--navy)}
+.tgl{display:flex;gap:5px}
+.tb{flex:1;padding:9px 4px;text-align:center;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--bg-sub);color:var(--text-sub);font-weight:500}
+.tb.g{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);font-weight:700}
+.tb.n{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+.tb.y{background:var(--yellow-bg);color:var(--yellow);border-color:var(--yellow-bd);font-weight:700}
+.tb.r{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);font-weight:700}
+input[type=range]{width:100%;-webkit-appearance:none;height:5px;border-radius:3px;outline:none;background:linear-gradient(to right,var(--navy) 0%,var(--navy) var(--val,0%),var(--border) var(--val,0%),var(--border) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--navy);cursor:pointer;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.sl-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-hint);margin-top:3px}
+.pnum{font-size:32px;font-weight:700;text-align:center;display:block;line-height:1.1}
+.mc{background:var(--bg-sub);border-radius:var(--radius-sm);padding:10px 6px;text-align:center}
+.mc .ml{font-size:10px;color:var(--text-sub);margin-bottom:3px;font-weight:600}
+.mc .mv{font-size:19px;font-weight:700}
+.yn{display:flex;gap:5px}
+.yb{flex:1;padding:9px 4px;text-align:center;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--bg-sub);color:var(--text-sub);font-weight:500}
+.yb.yes{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);font-weight:700}
+.yb.no{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);font-weight:700}
+.yb.hold{background:var(--gray-bg);color:var(--gray);border-color:var(--gray-bd);font-weight:700}
+.pcard{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;background:#fff;cursor:pointer;transition:background 0.1s}
+.pcard:active{background:var(--bg-sub)}
+.pcard+.pcard{border-top:0.5px solid var(--border)}
+.pcard.pinned{background:var(--bg-pin)}
+.pcard.pinned+.pcard:not(.pinned){border-top:1px solid var(--border)}
+.ck-row{padding:11px 12px;cursor:pointer;transition:background 0.1s}
+.ck-row:active{background:var(--bg-sub)}
+.ck-row+.ck-row{border-top:0.5px solid var(--border)}
+.ck-row.pinned{background:var(--bg-pin)}
+.ck-row.pinned+.ck-row:not(.pinned){border-top:1px solid var(--border)}
+.sub-tab-bar{display:flex;border-bottom:1px solid var(--border);margin:-14px -14px 14px;background:#fff}
+.stab{flex:1;padding:8px 4px;font-size:10px;text-align:center;color:var(--text-sub);cursor:pointer;border-bottom:2.5px solid transparent;font-weight:500;line-height:1.3;word-break:keep-all}
+.stab.active{color:var(--navy);border-bottom-color:var(--navy);font-weight:700}
+.hentry{border-left:3px solid var(--border);padding:9px 11px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;background:var(--bg-sub);margin-bottom:8px}
+.hentry:last-child{margin-bottom:0}
+.inj-card{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;background:#fff}
+.inj-card:last-child{margin-bottom:0}
+.inj-card.active-inj{border-color:var(--navy);background:#EFF6FF}
+.dr-card{background:var(--bg-sub);border-radius:var(--radius);padding:12px;margin-bottom:8px}
+.dr-card:last-child{margin-bottom:0}
+.search-wrap{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;background:var(--bg-sub)}
+.search-wrap.focused{border-color:var(--navy);background:#fff}
+.search-wrap input{border:none;background:transparent;font-size:14px;color:var(--text);font-family:inherit;outline:none;flex:1}
+.search-wrap input::placeholder{color:var(--text-hint)}
+.verdict-box{border-radius:var(--radius-sm);padding:11px;margin-top:6px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal-overlay.hidden{display:none}
+.modal{background:#fff;border-radius:var(--radius) var(--radius) 0 0;padding:20px;width:100%;max-width:430px;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px}
+.confirm-overlay.hidden{display:none}
+.confirm-box{background:#fff;border-radius:var(--radius);padding:20px;width:100%;max-width:320px}
+.confirm-title{font-size:15px;font-weight:700;margin-bottom:8px}
+.confirm-desc{font-size:13px;color:var(--text-sub);margin-bottom:18px;line-height:1.6}
+.loading-overlay{position:fixed;inset:0;background:rgba(27,58,92,0.92);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.loading-overlay.hidden{display:none}
+.loading-spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:#fff;font-size:14px;font-weight:500}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 22px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:opacity 0.25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.toast.show{opacity:1}
+.empty{text-align:center;padding:30px 0;color:var(--text-hint);font-size:13px;line-height:1.9}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.trainer-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg-sub);border:1px solid var(--border);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;margin:3px}
+.trainer-chip button{background:none;border:none;color:var(--text-hint);cursor:pointer;font-size:14px;line-height:1;padding:0}
+.pin-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;line-height:1;opacity:0.3;transition:opacity 0.15s}
+.pin-btn.pinned{opacity:1}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;margin-left:6px;vertical-align:middle}
+.sync-dot.offline{background:#EF4444}
+.detail-note{background:#EFF6FF;border-left:3px solid var(--navy);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:7px 10px;font-size:12px;color:var(--text-sub);line-height:1.6;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <h1>⚾ 두산 부상 관리 <span class="sync-dot" id="sync-dot"></span></h1>
+    <p id="today-label"></p>
+  </div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab('check')">일일 체크</div>
+    <div class="tab" onclick="switchTab('register')">신규 등록</div>
+    <div class="tab" onclick="switchTab('list')">선수 목록</div>
+    <div class="tab" onclick="switchTab('settings')">설정</div>
+  </div>
+
+  <!-- ① 일일 체크 -->
+  <div class="screen active" id="screen-check">
+    <div id="check-main-view">
+      <div class="row3">
+        <div class="mc"><div class="ml">완료</div><div class="mv" id="ck-done" style="color:var(--green)">0</div></div>
+        <div class="mc"><div class="ml">미완료</div><div class="mv" id="ck-todo" style="color:var(--red)">0</div></div>
+        <div class="mc"><div class="ml">전체</div><div class="mv" id="ck-total">0</div></div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <div id="check-list"><div class="empty">관리 중인 선수가 없습니다</div></div>
+      </div>
+    </div>
+
+    <div id="check-input-view" style="display:none;flex-direction:column;gap:12px">
+      <div class="back-btn" onclick="backToCheckList()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>돌아가기
+      </div>
+      <div style="background:var(--navy);border-radius:var(--radius);padding:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="ci-av" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0"></div>
+          <div><div id="ci-name" style="font-size:15px;font-weight:700;color:#fff"></div><div id="ci-sub" style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="field"><label>측정 트레이너</label><select id="ci-trainer"><option value="">선택하세요</option></select></div>
+        <div class="sec-label" style="margin-bottom:10px">오늘 NPRS 통증</div>
+        <div class="field"><label>현재 통증</label>
+          <div style="text-align:center;margin:4px 0"><span id="ci-p1" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+          <input type="range" min="0" max="10" value="0" step="1" oninput="updP('ci-p1',this)">
+          <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+        </div>
+        <div class="field"><label>훈련 중 통증</label>
+          <div style="text-align:center;margin:4px 0"><span id="ci-p2" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+          <input type="range" min="0" max="10" value="0" step="1" oninput="updP('ci-p2',this)">
+          <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+        </div>
+        <div class="field"><label>휴식 중 통증</label>
+          <div style="text-align:center;margin:4px 0"><span id="ci-p3" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+          <input type="range" min="0" max="10" value="0" step="1" oninput="updP('ci-p3',this)">
+          <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+        </div>
+        <div class="field"><label>오늘 상황 메모 <span style="font-size:10px;color:var(--text-hint)">(선택)</span></label>
+          <textarea id="ci-note" placeholder="오늘 특이사항을 간단히 기록하세요"></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-label" style="margin-bottom:10px">객관적 상태 체크</div>
+        <div class="field"><label>MMT (0~5) — 건측 / 환측</label>
+          <div class="row2"><input type="number" id="ci-mh" min="0" max="5" placeholder="건측" oninput="calcCiR()"><input type="number" id="ci-mi" min="0" max="5" placeholder="환측" oninput="calcCiR()"></div>
+        </div>
+        <div class="field"><label>ROM (°) — 건측 / 환측</label>
+          <div class="row2"><input type="number" id="ci-rh" placeholder="건측" oninput="calcCiR()"><input type="number" id="ci-ri" placeholder="환측" oninput="calcCiR()"></div>
+        </div>
+        <div class="field"><label>악력 (kg) — 건측 / 환측</label>
+          <div class="row2"><input type="number" id="ci-gh" placeholder="건측" oninput="calcCiR()"><input type="number" id="ci-gi" placeholder="환측" oninput="calcCiR()"></div>
+        </div>
+        <div class="row3" style="margin-bottom:12px">
+          <div class="mc"><div class="ml">MMT</div><div class="mv" id="ci-rm">—</div></div>
+          <div class="mc"><div class="ml">ROM</div><div class="mv" id="ci-rr">—</div></div>
+          <div class="mc"><div class="ml">악력</div><div class="mv" id="ci-rg">—</div></div>
+        </div>
+        <div class="field"><label>훈련 가능 여부</label>
+          <div class="tgl"><div class="tb" id="ci-t0" onclick="selCiT(0)">정상</div><div class="tb" id="ci-t1" onclick="selCiT(1)">부분</div><div class="tb" id="ci-t2" onclick="selCiT(2)">불가</div></div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="saveCiDaily()">오늘 체크 저장</button>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+
+  <!-- ② 신규 등록 -->
+  <div class="screen" id="screen-register">
+    <div id="step1">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div class="sec-label">선수 기본 정보</div><span style="font-size:11px;color:var(--text-hint)">1 / 2</span>
+      </div>
+      <div class="step-bar"><div class="step-dot done"></div><div class="step-dot"></div></div>
+      <div class="card">
+        <div class="field"><label>선수명</label><input type="text" id="s1-name" placeholder="이름 입력"></div>
+        <div class="field"><label>포지션</label><select id="s1-pos"><option>투수</option><option>포수</option><option>1루수</option><option>2루수</option><option>3루수</option><option>유격수</option><option>좌익수</option><option>중견수</option><option>우익수</option></select></div>
+        <div class="field"><label>주 사용 팔</label><div class="tgl"><div class="tb" id="ab0" onclick="selArm(0)">우투</div><div class="tb" id="ab1" onclick="selArm(1)">좌투</div></div></div>
+        <div class="field"><div class="row2">
+          <div><label>키 (cm)</label><input type="number" id="s1-h" placeholder="183"></div>
+          <div><label>체중 (kg)</label><input type="number" id="s1-w" placeholder="82"></div>
+        </div></div>
+      </div>
+      <button class="btn-primary" style="margin-top:6px" onclick="goStep(2)">다음</button>
+    </div>
+    <div id="step2" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div class="sec-label">부상 정보</div><span style="font-size:11px;color:var(--text-hint)">2 / 2</span>
+      </div>
+      <div class="step-bar"><div class="step-dot done"></div><div class="step-dot done"></div></div>
+      <div class="card">
+        <!-- 부상 유형 선택 -->
+        <div class="field"><label>부상 유형</label>
+          <div class="tgl"><div class="tb" id="itype-0" onclick="selInjType(0)">외상</div><div class="tb" id="itype-1" onclick="selInjType(1)">내과</div></div>
+        </div>
+        <!-- 외상 필드 -->
+        <div id="trauma-fields">
+          <div class="field"><label>부상 부위</label><select id="s2-area"><option>어깨</option><option>팔꿈치</option><option>손목</option><option>허리</option><option>옆구리</option><option>무릎</option><option>발목</option><option>기타</option></select></div>
+          <div class="field"><div class="row2">
+            <div><label>발생일</label><input type="date" id="s2-date"></div>
+            <div><label>발생 경위</label><select id="s2-cause"><option>투구 중</option><option>타격 중</option><option>수비 중</option><option>주루 중</option><option>훈련 중</option><option>기타</option></select></div>
+          </div></div>
+          <div class="field"><label>상황 상세</label><textarea id="s2-detail" placeholder="언제, 어떤 동작에서, 어떤 느낌인지 자유롭게 기록"></textarea></div>
+        </div>
+        <!-- 내과 필드 -->
+        <div id="medical-fields" style="display:none">
+          <div class="field"><label>발생일</label><input type="date" id="s2-mdate"></div>
+          <div class="field"><label>증상</label>
+            <select id="s2-msymptom">
+              <option value="">선택하세요</option>
+              <option>감기/몸살</option><option>소화불량</option><option>장염</option><option>알러지</option><option>두통</option><option>기타</option>
+            </select>
+          </div>
+          <div class="field"><label>상세 내용 <span style="font-size:10px;color:var(--text-hint)">(선택)</span></label>
+            <textarea id="s2-mdetail" placeholder="예) 38도 발열, 인후통 있음. 수액 처치 후 안정 중."></textarea>
+          </div>
+        </div>
+        <div class="field"><label>현재 통증 (NPRS)</label>
+          <div style="text-align:center;margin:4px 0"><span id="rp1" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+          <input type="range" min="0" max="10" value="0" step="1" oninput="updP('rp1',this)">
+          <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+        </div>
+        <div class="field"><label>훈련 중 통증 (NPRS)</label>
+          <div style="text-align:center;margin:4px 0"><span id="rp2" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+          <input type="range" min="0" max="10" value="0" step="1" oninput="updP('rp2',this)">
+          <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+        </div>
+        <div class="field"><label>휴식 중 통증 (NPRS)</label>
+          <div style="text-align:center;margin:4px 0"><span id="rp3" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+          <input type="range" min="0" max="10" value="0" step="1" oninput="updP('rp3',this)">
+          <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+        </div>
+        <div class="field"><label>훈련 가능 여부</label><div class="tgl"><div class="tb" id="rt0" onclick="selRT(0)">정상</div><div class="tb" id="rt1" onclick="selRT(1)">부분</div><div class="tb" id="rt2" onclick="selRT(2)">불가</div></div></div>
+        <div style="height:1px;background:var(--border);margin:12px 0"></div>
+        <div class="sec-label" style="margin-bottom:10px">기능 & 판단</div>
+        <div class="field"><label>훈련 수정 필요</label><div class="yn"><div class="yb" id="f0y" onclick="setFn(0,'yes')">예</div><div class="yb" id="f0n" onclick="setFn(0,'no')">아니오</div><div class="yb" id="f0h" onclick="setFn(0,'hold')">보류</div></div></div>
+        <div class="field"><label>즉시 진료 필요</label><div class="yn"><div class="yb" id="f1y" onclick="setFn(1,'yes')">예</div><div class="yb" id="f1n" onclick="setFn(1,'no')">아니오</div><div class="yb" id="f1h" onclick="setFn(1,'hold')">보류</div></div></div>
+        <div class="field"><label>체중 부하 가능</label><div class="yn"><div class="yb" id="f2y" onclick="setFn(2,'yes')">예</div><div class="yb" id="f2n" onclick="setFn(2,'no')">아니오</div><div class="yb" id="f2h" onclick="setFn(2,'hold')">보류</div></div></div>
+        <div class="field"><label>부종 / 변형 있음</label><div class="yn"><div class="yb" id="f3y" onclick="setFn(3,'yes')">예</div><div class="yb" id="f3n" onclick="setFn(3,'no')">아니오</div><div class="yb" id="f3h" onclick="setFn(3,'hold')">보류</div></div></div>
+        <div id="reg-verdict" class="verdict-box" style="display:none"><div id="rv-t" style="font-size:13px;font-weight:700;margin-bottom:3px"></div><div id="rv-d" style="font-size:11px;line-height:1.6"></div></div>
+      </div>
+      <div class="row2" style="margin-top:6px;gap:8px">
+        <button class="btn-secondary" onclick="goStep(1)">이전</button>
+        <button class="btn-primary" onclick="registerPlayer()">등록 완료</button>
+      </div>
+      <div style="height:12px"></div>
+    </div>
+  </div>
+
+  <!-- ③ 선수 목록 -->
+  <div class="screen" id="screen-list">
+    <div id="list-view">
+      <div class="search-wrap" id="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search-input" placeholder="선수 이름으로 검색" oninput="filterPlayers()" onfocus="document.getElementById('search-wrap').classList.add('focused')" onblur="document.getElementById('search-wrap').classList.remove('focused')">
+      </div>
+      <div id="search-count" style="font-size:11px;color:var(--text-hint);margin-bottom:6px;display:none"></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <div id="player-list"></div>
+      </div>
+    </div>
+    <div id="detail-view" style="display:none;flex-direction:column;gap:12px">
+      <div class="back-btn" onclick="backToList()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>목록으로
+      </div>
+      <div style="background:var(--navy);border-radius:var(--radius);padding:15px">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:11px">
+          <div id="d-av" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0"></div>
+          <div style="flex:1"><div id="d-name" style="font-size:17px;font-weight:700;color:#fff"></div><div id="d-sub" style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px"></div></div>
+          <button onclick="openEditPlayer()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;cursor:pointer;font-weight:600">수정</button>
+        </div>
+        <div style="background:rgba(255,255,255,0.12);border-radius:var(--radius-sm);padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:rgba(255,255,255,0.75);font-weight:500">현재 상태</span>
+          <span id="d-status" class="badge"></span>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="sub-tab-bar">
+          <div class="stab active" onclick="switchSub('injuries')">부상<br>목록</div>
+          <div class="stab" onclick="switchSub('history')">치료<br>기록</div>
+          <div class="stab" onclick="switchSub('records')">보고<br>기록</div>
+        </div>
+        <!-- 부상 목록 -->
+        <div id="sub-injuries" style="padding:14px">
+          <div id="inj-list"></div>
+          <button class="btn-outline" style="margin-top:10px" onclick="showAddInj()">+ 부상 추가</button>
+          <div id="add-inj-form" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+            <div class="sec-label" style="margin-bottom:10px">새 부상 등록</div>
+            <div class="field"><label>부상 유형</label>
+              <div class="tgl"><div class="tb" id="ai-itype-0" onclick="selAiInjType(0)">외상</div><div class="tb" id="ai-itype-1" onclick="selAiInjType(1)">내과</div></div>
+            </div>
+            <div id="ai-trauma-fields">
+              <div class="field"><label>부상 부위</label><select id="ai-area"><option>어깨</option><option>팔꿈치</option><option>손목</option><option>허리</option><option>옆구리</option><option>무릎</option><option>발목</option><option>기타</option></select></div>
+              <div class="field"><div class="row2">
+                <div><label>발생일</label><input type="date" id="ai-date"></div>
+                <div><label>발생 경위</label><select id="ai-cause"><option>투구 중</option><option>타격 중</option><option>수비 중</option><option>주루 중</option><option>훈련 중</option><option>기타</option></select></div>
+              </div></div>
+              <div class="field"><label>상황 상세</label><textarea id="ai-detail" placeholder="상황을 자유롭게 기록하세요"></textarea></div>
+            </div>
+            <div id="ai-medical-fields" style="display:none">
+              <div class="field"><label>발생일</label><input type="date" id="ai-mdate"></div>
+              <div class="field"><label>증상</label>
+                <select id="ai-msymptom"><option value="">선택하세요</option><option>감기/몸살</option><option>소화불량</option><option>장염</option><option>알러지</option><option>두통</option><option>기타</option></select>
+              </div>
+              <div class="field"><label>상세 내용 <span style="font-size:10px;color:var(--text-hint)">(선택)</span></label>
+                <textarea id="ai-mdetail" placeholder="예) 38도 발열, 인후통 있음."></textarea>
+              </div>
+            </div>
+            <div class="field"><label>현재 통증</label>
+              <div style="text-align:center;margin:4px 0"><span id="ai-p1" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+              <input type="range" min="0" max="10" value="0" step="1" oninput="updP('ai-p1',this)">
+              <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+            </div>
+            <div class="field"><label>훈련 중 통증</label>
+              <div style="text-align:center;margin:4px 0"><span id="ai-p2" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+              <input type="range" min="0" max="10" value="0" step="1" oninput="updP('ai-p2',this)">
+              <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+            </div>
+            <div class="field"><label>휴식 중 통증</label>
+              <div style="text-align:center;margin:4px 0"><span id="ai-p3" class="pnum" style="color:var(--navy)">0</span><span style="font-size:14px;color:var(--text-hint)">/10</span></div>
+              <input type="range" min="0" max="10" value="0" step="1" oninput="updP('ai-p3',this)">
+              <div class="sl-labels"><span>0 없음</span><span>5 중간</span><span>10 극심</span></div>
+            </div>
+            <div class="field"><label>훈련 가능 여부</label><div class="tgl"><div class="tb" id="ai-t0" onclick="selAiT(0)">정상</div><div class="tb" id="ai-t1" onclick="selAiT(1)">부분</div><div class="tb" id="ai-t2" onclick="selAiT(2)">불가</div></div></div>
+            <div class="sec-label" style="margin:10px 0 8px">기능 & 판단</div>
+            <div class="field"><label>훈련 수정 필요</label><div class="yn"><div class="yb" id="af0y" onclick="setAiFn(0,'yes')">예</div><div class="yb" id="af0n" onclick="setAiFn(0,'no')">아니오</div><div class="yb" id="af0h" onclick="setAiFn(0,'hold')">보류</div></div></div>
+            <div class="field"><label>즉시 진료 필요</label><div class="yn"><div class="yb" id="af1y" onclick="setAiFn(1,'yes')">예</div><div class="yb" id="af1n" onclick="setAiFn(1,'no')">아니오</div><div class="yb" id="af1h" onclick="setAiFn(1,'hold')">보류</div></div></div>
+            <div class="field"><label>체중 부하 가능</label><div class="yn"><div class="yb" id="af2y" onclick="setAiFn(2,'yes')">예</div><div class="yb" id="af2n" onclick="setAiFn(2,'no')">아니오</div><div class="yb" id="af2h" onclick="setAiFn(2,'hold')">보류</div></div></div>
+            <div class="field"><label>부종 / 변형 있음</label><div class="yn"><div class="yb" id="af3y" onclick="setAiFn(3,'yes')">예</div><div class="yb" id="af3n" onclick="setAiFn(3,'no')">아니오</div><div class="yb" id="af3h" onclick="setAiFn(3,'hold')">보류</div></div></div>
+            <div id="ai-verdict" class="verdict-box" style="display:none"><div id="ai-vt" style="font-size:13px;font-weight:700;margin-bottom:3px"></div><div id="ai-vd" style="font-size:11px;line-height:1.6"></div></div>
+            <div class="row2" style="gap:8px;margin-top:6px">
+              <button class="btn-secondary" onclick="hideAddInj()">취소</button>
+              <button class="btn-primary" onclick="saveInj()">부상 저장</button>
+            </div>
+          </div>
+        </div>
+        <!-- 치료 기록 -->
+        <div id="sub-history" style="display:none;padding:14px">
+          <div id="tx-list"></div>
+          <div class="field" style="margin-top:10px"><label>오늘 치료 내용</label>
+            <textarea id="tx-input" placeholder="치료 내용 입력"></textarea>
+          </div>
+          <button class="btn-primary" onclick="saveTx()">히스토리에 저장</button>
+        </div>
+        <!-- 보고 기록 -->
+        <div id="sub-records" style="display:none;padding:14px">
+          <div id="records-list"><div class="empty" style="padding:20px 0">보고 기록이 없습니다</div></div>
+        </div>
+      </div>
+      <button class="btn-danger" onclick="confirmDeletePlayer()">선수 삭제</button>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+
+  <!-- ④ 설정 -->
+  <div class="screen" id="screen-settings">
+    <div class="sec-label">트레이너 관리</div>
+    <div class="card">
+      <div class="field"><label>트레이너 이름 추가</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="trainer-input" placeholder="이름 입력" style="flex:1">
+          <button onclick="addTrainer()" style="padding:10px 14px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">추가</button>
+        </div>
+      </div>
+      <div id="trainer-list" style="margin-top:8px;min-height:32px"></div>
+    </div>
+    <div class="sec-label" style="margin-top:4px">연결 상태</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="sync-dot" id="sync-dot2"></span>
+        <span id="sync-status" style="font-size:13px;color:var(--text-sub)">Firebase 연결 중...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 선수 수정 모달 -->
+<div class="modal-overlay hidden" id="edit-player-modal">
+  <div class="modal">
+    <div class="modal-title">선수 정보 수정</div>
+    <div class="field"><label>선수명</label><input type="text" id="ep-name"></div>
+    <div class="field"><label>포지션</label><select id="ep-pos"><option>투수</option><option>포수</option><option>1루수</option><option>2루수</option><option>3루수</option><option>유격수</option><option>좌익수</option><option>중견수</option><option>우익수</option></select></div>
+    <div class="field"><label>주 사용 팔</label><div class="tgl"><div class="tb" id="ep-ab0" onclick="selEpArm(0)">우투</div><div class="tb" id="ep-ab1" onclick="selEpArm(1)">좌투</div></div></div>
+    <div class="field"><div class="row2">
+      <div><label>키 (cm)</label><input type="number" id="ep-h"></div>
+      <div><label>체중 (kg)</label><input type="number" id="ep-w"></div>
+    </div></div>
+    <div class="row2" style="gap:8px;margin-top:4px">
+      <button class="btn-secondary" onclick="closeEditPlayer()">취소</button>
+      <button class="btn-primary" onclick="saveEditPlayer()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 확인 다이얼로그 -->
+<div class="confirm-overlay hidden" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title"></div>
+    <div class="confirm-desc" id="confirm-desc"></div>
+    <div class="row2" style="gap:8px">
+      <button class="btn-secondary" onclick="closeConfirm()">취소</button>
+      <button id="confirm-ok-btn" class="btn-primary" style="background:var(--red)">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Firebase 연결 중...</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAIY3604kQqj66JXqzFmcYnM21Ca7ibnic",
+  authDomain: "doosan-injury-management.firebaseapp.com",
+  projectId: "doosan-injury-management",
+  storageBucket: "doosan-injury-management.firebasestorage.app",
+  messagingSenderId: "823840139585",
+  appId: "1:823840139585:web:9b97d71cc6bdc6c68759c0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let players=[], injuries=[], treatments=[], dailyReports=[], trainers=[];
+
+function setConnected(v){
+  const dot=document.getElementById('sync-dot');
+  const dot2=document.getElementById('sync-dot2');
+  const status=document.getElementById('sync-status');
+  if(dot) dot.style.background=v?'#22C55E':'#EF4444';
+  if(dot2) dot2.style.background=v?'#22C55E':'#EF4444';
+  if(status) status.textContent=v?'Firebase 연결됨 — 실시간 동기화 중':'연결 끊김';
+}
+
+function initListeners(){
+  onSnapshot(collection(db,'players'), snap=>{
+    players=snap.docs.map(d=>({id:d.id,...d.data()}));
+    setConnected(true);
+    document.getElementById('loading-overlay').classList.add('hidden');
+    refreshAll();
+  }, ()=>{ setConnected(false); document.getElementById('loading-overlay').classList.add('hidden'); });
+  onSnapshot(collection(db,'injuries'), snap=>{ injuries=snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
+  onSnapshot(collection(db,'treatments'), snap=>{ treatments=snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
+  onSnapshot(collection(db,'dailyReports'), snap=>{ dailyReports=snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
+  onSnapshot(doc(db,'settings','trainers'), snap=>{ trainers=snap.exists()?snap.data().list||[]:[];  renderTrainers(); populateCiTrainerSelect(); });
+}
+
+function refreshAll(){
+  const idx=Array.from(document.querySelectorAll('.tab')).findIndex(t=>t.classList.contains('active'));
+  if(idx===0) renderCheck();
+  if(idx===2) renderList();
+}
+
+window.fbAddPlayer=async(d)=>{const r=await addDoc(collection(db,'players'),d);return r.id};
+window.fbUpdatePlayer=async(id,d)=>updateDoc(doc(db,'players',id),d);
+window.fbDeletePlayer=async(id)=>deleteDoc(doc(db,'players',id));
+window.fbAddInjury=async(d)=>{const r=await addDoc(collection(db,'injuries'),d);return r.id};
+window.fbUpdateInjury=async(id,d)=>updateDoc(doc(db,'injuries',id),d);
+window.fbAddTx=async(d)=>addDoc(collection(db,'treatments'),d);
+window.fbAddDaily=async(d)=>addDoc(collection(db,'dailyReports'),d);
+window.fbSaveTrainers=async(list)=>setDoc(doc(db,'settings','trainers'),{list});
+window.fbUpdateDoc=async(col,id,d)=>updateDoc(doc(db,col,id),d);
+window.fbDeleteDoc=async(col,id)=>deleteDoc(doc(db,col,id));
+window.getPlayers=()=>players;
+window.getInjuries=()=>injuries;
+window.getTreatments=()=>treatments;
+window.getDailyReports=()=>dailyReports;
+window.getTrainers=()=>trainers;
+
+initListeners();
+</script>
+
+<script>
+const today=new Date();
+const todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+// 정오 체크: 오늘 날짜 + 정오까지만 유효
+function getTodayCheckKey(){
+  // 정오 이후면 내일 날짜 키 사용 (오늘 체크 초기화)
+  const now=new Date();
+  const noon=new Date(now.getFullYear(),now.getMonth(),now.getDate(),12,0,0);
+  if(now>=noon){
+    // 정오 이후면 오늘 오전 데이터는 어제 것으로 간주, 새 체크는 내일
+    return todayStr+'_pm'; // 오후 세션
+  }
+  return todayStr+'_am'; // 오전 세션
+}
+const checkKey=getTodayCheckKey();
+
+document.getElementById('today-label').textContent=today.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+document.getElementById('s2-date').value=todayStr;
+document.getElementById('ai-date').value=todayStr;
+document.getElementById('s2-mdate').value=todayStr;
+document.getElementById('ai-mdate').value=todayStr;
+
+let curPid=null,selArm_=0,selRT_=-1,selAiT_=-1,selEpArm_=0,selCiT_=-1;
+let fnState=['','','',''],aiFnState=['','','',''];
+let injType=0, aiInjType=0; // 0=외상, 1=내과
+let ciPid=null;
+
+const pc=v=>{const n=+v;return n<=3?'#16A34A':n<=6?'#D97706':'#DC2626'};
+const trainLabel=['정상훈련','부분참여','훈련불가'];
+const trainCls=['green','yellow','red'];
+const fnLabels=[['훈련 수정 필요','훈련 수정 불필요'],['즉시 진료 필요','진료 불필요'],['체중부하 가능','체중부하 불가'],['부종/변형 있음','부종/변형 없음']];
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function updP(elId,input){const v=input.value;document.getElementById(elId).textContent=v;document.getElementById(elId).style.color=pc(v);input.style.setProperty('--val',(v/10*100)+'%')}
+
+// 부상 유형 토글
+function selInjType(i){
+  injType=i;
+  [0,1].forEach(j=>document.getElementById('itype-'+j).className='tb'+(j===i?' n':''));
+  document.getElementById('trauma-fields').style.display=i===0?'block':'none';
+  document.getElementById('medical-fields').style.display=i===1?'block':'none';
+}
+function selAiInjType(i){
+  aiInjType=i;
+  [0,1].forEach(j=>document.getElementById('ai-itype-'+j).className='tb'+(j===i?' n':''));
+  document.getElementById('ai-trauma-fields').style.display=i===0?'block':'none';
+  document.getElementById('ai-medical-fields').style.display=i===1?'block':'none';
+}
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['check','register','list','settings'][i]===id));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  if(id==='check'){renderCheck();backToCheckList();}
+  if(id==='list'){renderList();backToList();}
+  if(id==='settings') renderTrainers();
+}
+function switchSub(id){
+  ['injuries','history','records'].forEach((s,i)=>{
+    document.querySelectorAll('.stab')[i].classList.toggle('active',s===id);
+    document.getElementById('sub-'+s).style.display=s===id?'block':'none';
+  });
+  if(id==='history') renderTx();
+  if(id==='records') renderRecords();
+  if(id==='injuries') renderInjuries();
+}
+
+function togglePin(pid,e){
+  e.stopPropagation();
+  const p=getPlayers().find(x=>x.id===pid);
+  if(p&&window.fbUpdatePlayer) window.fbUpdatePlayer(pid,{pinned:!p.pinned});
+}
+
+function getActiveInj(pid){return getInjuries().filter(i=>i.pid===pid&&i.status==='active').sort((a,b)=>b.date.localeCompare(a.date))[0]||null}
+function getStatusBadge(pid){
+  const inj=getActiveInj(pid);
+  if(!inj)return{text:'부상 없음',cls:'gray'};
+  if(inj.injType==='내과')return{text:'내과 관리',cls:'purple'};
+  if(inj.fnState&&inj.fnState[1]==='yes')return{text:'즉시 진료',cls:'red'};
+  if(inj.trainStatus===2)return{text:'훈련 불가',cls:'red'};
+  if(inj.trainStatus===1)return{text:'훈련 수정',cls:'yellow'};
+  if(inj.trainStatus===0)return{text:'정상 훈련',cls:'green'};
+  return{text:'관리 중',cls:'blue'};
+}
+
+function getPlayers(){return window.getPlayers?window.getPlayers():[]}
+function getInjuries(){return window.getInjuries?window.getInjuries():[]}
+function getTreatments(){return window.getTreatments?window.getTreatments():[]}
+function getDailyReports(){return window.getDailyReports?window.getDailyReports():[]}
+function getTrainers(){return window.getTrainers?window.getTrainers():[]}
+
+// 24시간 기준 오늘 보고 필터
+function getTodayReports(){
+  return getDailyReports().filter(r=>r.date===todayStr);
+}
+
+function renderCheck(){
+  const managing=getPlayers().filter(p=>getActiveInj(p.id));
+  const todayReps=getTodayReports();
+  const doneIds=new Set(todayReps.map(r=>r.pid));
+  document.getElementById('ck-total').textContent=managing.length;
+  document.getElementById('ck-done').textContent=managing.filter(p=>doneIds.has(p.id)).length;
+  document.getElementById('ck-todo').textContent=managing.filter(p=>!doneIds.has(p.id)).length;
+  const wrap=document.getElementById('check-list');
+  if(!managing.length){wrap.innerHTML='<div class="empty">관리 중인 선수가 없습니다</div>';return;}
+  const pinned=managing.filter(p=>p.pinned);
+  const normal=managing.filter(p=>!p.pinned);
+  const sorted=[...pinned,...normal];
+  const cc=v=>+v>=90?'#16A34A':+v>=70?'#D97706':'#DC2626';
+  wrap.innerHTML=sorted.map((p,idx)=>{
+    const done=doneIds.has(p.id);
+    const r=todayReps.find(x=>x.pid===p.id);
+    const inj=getActiveInj(p.id);
+    const isPinned=!!p.pinned;
+    const hasObj=r&&(r.rMmt!==null||r.rRom!==null||r.rGrip!==null);
+    return`<div class="ck-row ${isPinned?'pinned':''}" onclick="openCheckInput('${p.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${done?'9px':'0'}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar">${p.name.charAt(0)}</div>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text)">${p.name}${isPinned?' 📌':''} <span style="font-size:11px;color:var(--text-hint);font-weight:400">${p.pos}</span></div>
+            <div style="font-size:12px;color:var(--text-sub);margin-top:2px">${inj?inj.area||inj.symptom||'':''}</div>
+            ${inj&&(inj.detail||inj.mdetail)?'<div style="font-size:11px;color:var(--text-hint);margin-top:3px;line-height:1.5">'+((inj.detail||inj.mdetail).length>45?(inj.detail||inj.mdetail).substring(0,45)+'...':inj.detail||inj.mdetail)+'</div>':''}
+          </div>
+        </div>
+        <span class="badge ${done?'green':'gray'}">${done?'완료':'미완료'}</span>
+      </div>
+      ${done&&r?`<div style="background:rgba(0,0,0,0.03);border-radius:var(--radius-sm);padding:9px 11px">
+        ${r.trainer?`<div style="font-size:10px;color:var(--text-hint);margin-bottom:6px">측정: <strong>${r.trainer}</strong></div>`:''}
+        <div class="row3" style="margin-bottom:${(hasObj||r.note)?'8px':'0'}">
+          <div style="text-align:center"><div style="font-size:10px;color:var(--text-hint);margin-bottom:2px">현재</div><div style="font-size:16px;font-weight:700;color:${pc(r.p1)}">${r.p1}</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--text-hint);margin-bottom:2px">훈련</div><div style="font-size:16px;font-weight:700;color:${pc(r.p2)}">${r.p2}</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--text-hint);margin-bottom:2px">휴식</div><div style="font-size:16px;font-weight:700;color:${pc(r.p3)}">${r.p3}</div></div>
+        </div>
+        ${r.note?`<div class="detail-note">${r.note}</div>`:''}
+        ${hasObj?`<div style="display:flex;justify-content:space-between;padding-top:7px;border-top:0.5px solid var(--border);align-items:center;margin-top:6px">
+          <div style="display:flex;gap:10px">
+            ${r.rMmt!==null?`<span style="font-size:11px;color:var(--text-sub)">MMT <strong style="color:${cc(r.rMmt)}">${r.rMmt}%</strong></span>`:''}
+            ${r.rRom!==null?`<span style="font-size:11px;color:var(--text-sub)">ROM <strong style="color:${cc(r.rRom)}">${r.rRom}%</strong></span>`:''}
+            ${r.rGrip!==null?`<span style="font-size:11px;color:var(--text-sub)">악력 <strong style="color:${cc(r.rGrip)}">${r.rGrip}%</strong></span>`:''}
+          </div>
+          ${r.train>=0?`<span class="badge ${trainCls[r.train]}" style="font-size:10px">${trainLabel[r.train]}</span>`:''}
+        </div>`:''}
+      </div>`:`<div style="margin-top:9px;border:1px dashed var(--border);border-radius:var(--radius-sm);padding:8px;text-align:center;font-size:12px;color:var(--text-hint)">탭하여 체크 입력</div>`}
+    </div>`;
+  }).join('');
+}
+
+function openCheckInput(pid){
+  ciPid=pid;
+  const p=getPlayers().find(x=>x.id===pid);
+  const inj=getActiveInj(pid);
+  document.getElementById('check-main-view').style.display='none';
+  document.getElementById('check-input-view').style.display='flex';
+  document.getElementById('ci-av').textContent=p.name.charAt(0);
+  document.getElementById('ci-name').textContent=p.name+(p.pinned?' 📌':'');
+  document.getElementById('ci-sub').textContent=`${p.pos} · ${inj?inj.area||inj.symptom||'':''}`;
+  resetCiForm(); populateCiTrainerSelect();
+}
+function backToCheckList(){ciPid=null;document.getElementById('check-main-view').style.display='block';document.getElementById('check-input-view').style.display='none'}
+function populateCiTrainerSelect(){const sel=document.getElementById('ci-trainer');const list=getTrainers();sel.innerHTML='<option value="">선택하세요</option>'+list.map(t=>`<option value="${t}">${t}</option>`).join('')}
+function resetCiForm(){
+  selCiT_=-1;[0,1,2].forEach(j=>document.getElementById('ci-t'+j).className='tb');
+  ['ci-mh','ci-mi','ci-rh','ci-ri','ci-gh','ci-gi'].forEach(id=>document.getElementById(id).value='');
+  ['ci-rm','ci-rr','ci-rg'].forEach(id=>{const e=document.getElementById(id);e.textContent='—';e.style.color='var(--text)'});
+  ['ci-p1','ci-p2','ci-p3'].forEach(id=>{const e=document.getElementById(id);e.textContent='0';e.style.color='var(--navy)'});
+  document.querySelectorAll('#check-input-view input[type=range]').forEach(r=>{r.value=0;r.style.setProperty('--val','0%')});
+  document.getElementById('ci-note').value='';
+}
+function selCiT(i){selCiT_=i;[0,1,2].forEach(j=>document.getElementById('ci-t'+j).className='tb'+(j===i?' '+(j===0?'g':j===1?'y':'r'):''))}
+function calcRatio(h,i){const hv=parseFloat(h),iv=parseFloat(i);if(!hv||isNaN(iv))return null;return Math.round(iv/hv*100)}
+function calcCiR(){
+  const r1=calcRatio(document.getElementById('ci-mh').value,document.getElementById('ci-mi').value);
+  const r2=calcRatio(document.getElementById('ci-rh').value,document.getElementById('ci-ri').value);
+  const r3=calcRatio(document.getElementById('ci-gh').value,document.getElementById('ci-gi').value);
+  const cc=v=>v===null?'var(--text)':v>=90?'#16A34A':v>=70?'#D97706':'#DC2626';
+  [['ci-rm',r1],['ci-rr',r2],['ci-rg',r3]].forEach(([id,r])=>{const e=document.getElementById(id);e.textContent=r!==null?r+'%':'—';e.style.color=cc(r)});
+}
+async function saveCiDaily(){
+  if(!ciPid){toast('오류가 발생했어요');return;}
+  const trainer=document.getElementById('ci-trainer').value;
+  if(!trainer){toast('측정 트레이너를 선택해주세요');return;}
+  const r1=calcRatio(document.getElementById('ci-mh').value,document.getElementById('ci-mi').value);
+  const r2=calcRatio(document.getElementById('ci-rh').value,document.getElementById('ci-ri').value);
+  const r3=calcRatio(document.getElementById('ci-gh').value,document.getElementById('ci-gi').value);
+  if(window.fbAddDaily) await window.fbAddDaily({
+    pid:ciPid, date:todayStr, trainer, timestamp:new Date().toISOString(),
+    p1:document.getElementById('ci-p1').textContent,
+    p2:document.getElementById('ci-p2').textContent,
+    p3:document.getElementById('ci-p3').textContent,
+    note:document.getElementById('ci-note').value,
+    mmtH:document.getElementById('ci-mh').value, mmtI:document.getElementById('ci-mi').value,
+    romH:document.getElementById('ci-rh').value, romI:document.getElementById('ci-ri').value,
+    gripH:document.getElementById('ci-gh').value, gripI:document.getElementById('ci-gi').value,
+    rMmt:r1, rRom:r2, rGrip:r3, train:selCiT_
+  });
+  toast('체크 저장 완료'); backToCheckList();
+}
+
+function filterPlayers(){
+  const q=document.getElementById('search-input').value.trim();
+  const sc=document.getElementById('search-count');
+  if(!q){sc.style.display='none';renderList(false);return;}
+  const filtered=getPlayers().filter(p=>p.name.includes(q));
+  sc.style.display='block';sc.textContent=`"${q}" 검색 결과 ${filtered.length}명`;
+  renderList(false,filtered,q);
+}
+function renderList(reset=true,filtered=null,q=''){
+  if(reset){document.getElementById('search-input').value='';document.getElementById('search-count').style.display='none';}
+  const wrap=document.getElementById('player-list');
+  const all=getPlayers();
+  if(!all.length){wrap.innerHTML='<div class="empty">등록된 선수가 없습니다<br><span style="font-size:11px">신규 등록 탭에서 선수를 추가하세요</span></div>';return;}
+  const pinned=all.filter(p=>p.pinned);
+  const normal=all.filter(p=>!p.pinned);
+  const sorted=[...pinned,...normal];
+  wrap.innerHTML=sorted.map(p=>{
+    const sb=getStatusBadge(p.id);
+    const inj=getActiveInj(p.id);
+    const matched=!filtered||!!filtered.find(x=>x.id===p.id);
+    const nameHtml=q?p.name.replace(new RegExp(q,'g'),`<span style="color:var(--navy);font-weight:700">${q}</span>`):p.name;
+    return`<div class="pcard ${p.pinned?'pinned':''}" onclick="openDetail('${p.id}')" style="opacity:${matched?1:0.25}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar">${p.name.charAt(0)}</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">${nameHtml} <span style="font-size:11px;color:var(--text-hint);font-weight:400">${p.pos}</span></div>
+          <div style="font-size:12px;color:var(--text-sub);margin-top:2px">${inj?inj.area||inj.symptom||'부상 없음':'부상 없음'}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="pin-btn ${p.pinned?'pinned':''}" onclick="togglePin('${p.id}',event)">📌</button>
+        <span class="badge ${sb.cls}">${sb.text}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openDetail(pid){
+  curPid=pid;
+  const p=getPlayers().find(x=>x.id===pid);
+  document.getElementById('list-view').style.display='none';
+  document.getElementById('detail-view').style.display='flex';
+  document.getElementById('d-av').textContent=p.name.charAt(0);
+  document.getElementById('d-name').textContent=p.name+(p.pinned?' 📌':'');
+  document.getElementById('d-sub').textContent=`${p.pos} · ${p.height}cm · ${p.weight}kg · ${p.arm}`;
+  const sb=getStatusBadge(pid);
+  document.getElementById('d-status').textContent=sb.text;
+  document.getElementById('d-status').className='badge '+sb.cls;
+  switchSub('injuries');
+}
+function backToList(){curPid=null;document.getElementById('list-view').style.display='block';document.getElementById('detail-view').style.display='none';renderList()}
+function updateDetailHeader(){
+  if(!curPid)return;
+  const p=getPlayers().find(x=>x.id===curPid);
+  if(!p)return;
+  document.getElementById('d-av').textContent=p.name.charAt(0);
+  document.getElementById('d-name').textContent=p.name+(p.pinned?' 📌':'');
+  document.getElementById('d-sub').textContent=`${p.pos} · ${p.height}cm · ${p.weight}kg · ${p.arm}`;
+  const sb=getStatusBadge(curPid);
+  document.getElementById('d-status').textContent=sb.text;
+  document.getElementById('d-status').className='badge '+sb.cls;
+}
+function openEditPlayer(){
+  const p=getPlayers().find(x=>x.id===curPid);
+  document.getElementById('ep-name').value=p.name;
+  document.getElementById('ep-pos').value=p.pos;
+  document.getElementById('ep-h').value=p.height==='—'?'':p.height;
+  document.getElementById('ep-w').value=p.weight==='—'?'':p.weight;
+  selEpArm_=p.arm==='우투'?0:1;
+  [0,1].forEach(j=>document.getElementById('ep-ab'+j).className='tb'+(j===selEpArm_?' n':''));
+  document.getElementById('edit-player-modal').classList.remove('hidden');
+}
+function closeEditPlayer(){document.getElementById('edit-player-modal').classList.add('hidden')}
+function selEpArm(i){selEpArm_=i;[0,1].forEach(j=>document.getElementById('ep-ab'+j).className='tb'+(j===i?' n':''))}
+async function saveEditPlayer(){
+  const name=document.getElementById('ep-name').value.trim();
+  if(!name){toast('선수명을 입력해주세요');return;}
+  if(window.fbUpdatePlayer) await window.fbUpdatePlayer(curPid,{name,pos:document.getElementById('ep-pos').value,arm:selEpArm_===0?'우투':'좌투',height:document.getElementById('ep-h').value||'—',weight:document.getElementById('ep-w').value||'—'});
+  closeEditPlayer(); updateDetailHeader(); toast('선수 정보가 수정됐습니다');
+}
+let confirmCb=null;
+function showConfirm(title,desc,cb){document.getElementById('confirm-title').textContent=title;document.getElementById('confirm-desc').textContent=desc;confirmCb=cb;document.getElementById('confirm-overlay').classList.remove('hidden')}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.add('hidden');confirmCb=null}
+document.getElementById('confirm-ok-btn').onclick=()=>{if(confirmCb)confirmCb();closeConfirm()}
+async function confirmDeletePlayer(){
+  showConfirm('선수 삭제','선수와 관련된 모든 데이터가 삭제돼요.\n정말 삭제할까요?',async()=>{
+    if(window.fbDeletePlayer) await window.fbDeletePlayer(curPid);
+    backToList(); toast('선수가 삭제됐습니다');
+  });
+}
+function renderInjuries(){
+  const injuries=getInjuries().filter(i=>i.pid===curPid&&i.status!=='deleted').sort((a,b)=>b.date.localeCompare(a.date));
+  const wrap=document.getElementById('inj-list');
+  if(!injuries.length){wrap.innerHTML='<div class="empty" style="padding:14px 0">등록된 부상이 없습니다</div>';return;}
+  wrap.innerHTML=injuries.map(inj=>{
+    const isMedical=inj.injType==='내과';
+    const chips=(inj.fnState||[]).map((v,i)=>{
+      if(v==='yes')return`<span class="badge ${i===2?'green':'red'}" style="font-size:10px;padding:2px 7px">${fnLabels[i][0]}</span>`;
+      if(v==='no')return`<span class="badge ${i===2?'red':'green'}" style="font-size:10px;padding:2px 7px">${fnLabels[i][1]}</span>`;
+      if(v==='hold')return`<span class="badge gray" style="font-size:10px;padding:2px 7px">${fnLabels[i][0]} 보류</span>`;
+      return'';
+    }).join('');
+    return`<div class="inj-card ${inj.status==='active'?'active-inj':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:14px;font-weight:700">${isMedical?inj.symptom||'내과':inj.area}</span>
+          <span class="badge ${isMedical?'purple':'blue'}" style="font-size:10px">${isMedical?'내과':'외상'}</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="badge ${inj.status==='active'?'blue':'gray'}" style="font-size:10px">${inj.status==='active'?'관리 중':'완료'}</span>
+          ${inj.status==='active'?`<span style="font-size:11px;color:var(--navy);cursor:pointer;font-weight:700" onclick="closeInj('${inj.id}')">완료 처리</span>`:''}
+          <span style="font-size:11px;color:var(--red);cursor:pointer;font-weight:600" onclick="deleteInj('${inj.id}')">삭제</span>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-sub);margin-bottom:6px">${inj.date} ${!isMedical?'· '+inj.cause:''}</div>
+      ${(inj.detail||inj.mdetail)?`<div style="font-size:12px;color:var(--text-sub);background:var(--bg-sub);padding:8px 10px;border-radius:var(--radius-sm);margin-bottom:8px;line-height:1.6">${inj.detail||inj.mdetail}</div>`:''}
+      <div class="row3" style="margin-bottom:${chips?'8px':'0'}">
+        <div class="mc" style="padding:7px"><div class="ml">현재</div><div class="mv" style="font-size:17px;color:${pc(inj.p1)}">${inj.p1}</div></div>
+        <div class="mc" style="padding:7px"><div class="ml">훈련</div><div class="mv" style="font-size:17px;color:${pc(inj.p2)}">${inj.p2}</div></div>
+        <div class="mc" style="padding:7px"><div class="ml">휴식</div><div class="mv" style="font-size:17px;color:${pc(inj.p3)}">${inj.p3}</div></div>
+      </div>
+      ${chips?`<div style="display:flex;flex-wrap:wrap;gap:4px">${chips}</div>`:''}
+    </div>`;
+  }).join('');
+}
+async function closeInj(injId){
+  if(window.fbUpdateInjury) await window.fbUpdateInjury(injId,{status:'closed'});
+  toast('부상 완료 처리됐습니다');
+}
+async function deleteInj(injId){
+  if(!confirm('이 부상 기록을 삭제할까요?')) return;
+  if(window.fbDeleteDoc) await window.fbDeleteDoc('injuries',injId);
+  toast('부상 기록 삭제됐습니다');
+}
+function showAddInj(){document.getElementById('add-inj-form').style.display='block';resetAiForm()}
+function hideAddInj(){document.getElementById('add-inj-form').style.display='none'}
+function resetAiForm(){
+  aiFnState=['','','',''];selAiT_=-1;aiInjType=0;
+  [0,1].forEach(j=>document.getElementById('ai-itype-'+j).className='tb'+(j===0?' n':''));
+  document.getElementById('ai-trauma-fields').style.display='block';
+  document.getElementById('ai-medical-fields').style.display='none';
+  ['ai-p1','ai-p2','ai-p3'].forEach(id=>{const e=document.getElementById(id);e.textContent='0';e.style.color='var(--navy)'});
+  document.querySelectorAll('#add-inj-form input[type=range]').forEach(r=>{r.value=0;r.style.setProperty('--val','0%')});
+  [0,1,2].forEach(j=>document.getElementById('ai-t'+j).className='tb');
+  for(let i=0;i<4;i++)['y','n','h'].forEach(k=>document.getElementById('af'+i+k).className='yb');
+  document.getElementById('ai-verdict').style.display='none';
+  document.getElementById('ai-detail').value='';
+  document.getElementById('ai-mdetail').value='';
+}
+function setAiFn(idx,val){
+  aiFnState[idx]=val;
+  ['y','n','h'].forEach(k=>{const el=document.getElementById('af'+idx+k);const t=k==='y'?'yes':k==='n'?'no':'hold';el.className='yb'+(val===t?' '+t:'')});
+  calcVerdict('ai-verdict','ai-vt','ai-vd',aiFnState);
+}
+function selAiT(i){selAiT_=i;[0,1,2].forEach(j=>document.getElementById('ai-t'+j).className='tb'+(j===i?' '+(j===0?'g':j===1?'y':'r'):''))}
+async function saveInj(){
+  if(!curPid){toast('선수를 선택해주세요');return;}
+  const isMedical=aiInjType===1;
+  if(isMedical&&!document.getElementById('ai-msymptom').value){toast('증상을 선택해주세요');return;}
+  const data={
+    pid:curPid, status:'active', injType:isMedical?'내과':'외상',
+    date:isMedical?document.getElementById('ai-mdate').value:document.getElementById('ai-date').value,
+    p1:document.getElementById('ai-p1').textContent, p2:document.getElementById('ai-p2').textContent, p3:document.getElementById('ai-p3').textContent,
+    trainStatus:selAiT_, fnState:[...aiFnState]
+  };
+  if(isMedical){
+    data.symptom=document.getElementById('ai-msymptom').value;
+    data.mdetail=document.getElementById('ai-mdetail').value;
+    data.area='내과';
+  } else {
+    data.area=document.getElementById('ai-area').value;
+    data.cause=document.getElementById('ai-cause').value;
+    data.detail=document.getElementById('ai-detail').value;
+  }
+  if(window.fbAddInjury) await window.fbAddInjury(data);
+  hideAddInj(); toast('부상이 등록됐습니다');
+}
+function renderTx(){
+  const list=getTreatments().filter(t=>t.pid===curPid).sort((a,b)=>b.date.localeCompare(a.date));
+  const colors=['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899'];
+  document.getElementById('tx-list').innerHTML=list.length?list.map((t,i)=>`<div class="hentry" style="border-left-color:${colors[i%colors.length]}">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span style="font-size:10px;color:var(--text-hint);font-weight:600">${t.date}</span>
+      <div style="display:flex;gap:8px">
+        <span style="font-size:11px;color:var(--navy);cursor:pointer;font-weight:600" onclick="editTx('${t.id}','${t.text.replace(/'/g,&quot;&#39;&quot;)}')">수정</span>
+        <span style="font-size:11px;color:var(--red);cursor:pointer;font-weight:600" onclick="deleteTx('${t.id}')">삭제</span>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--text);line-height:1.6">${t.text}</div>
+  </div>`).join(''):'<div class="empty" style="padding:16px 0">치료 기록이 없습니다</div>';
+}
+function editTx(id, text){
+  const newText=prompt('치료 내용 수정', text);
+  if(newText&&newText.trim()&&window.fbUpdateDoc) window.fbUpdateDoc('treatments',id,{text:newText.trim()}).then(()=>toast('치료 기록 수정 완료'));
+}
+async function deleteTx(id){
+  if(!confirm('이 치료 기록을 삭제할까요?')) return;
+  if(window.fbDeleteDoc) await window.fbDeleteDoc('treatments',id);
+  toast('치료 기록 삭제됐습니다');
+}
+async function saveTx(){
+  const text=document.getElementById('tx-input').value.trim();
+  if(!text){toast('치료 내용을 입력해주세요');return;}
+  if(window.fbAddTx) await window.fbAddTx({pid:curPid,date:todayStr,text});
+  document.getElementById('tx-input').value=''; toast('치료 기록 저장 완료');
+}
+function renderRecords(){
+  const list=getDailyReports().filter(r=>r.pid===curPid).sort((a,b)=>b.date.localeCompare(a.date));
+  const wrap=document.getElementById('records-list');
+  if(!list.length){wrap.innerHTML='<div class="empty" style="padding:20px 0">보고 기록이 없습니다</div>';return;}
+  const cc=v=>v===null?'var(--text)':+v>=90?'#16A34A':+v>=70?'#D97706':'#DC2626';
+  wrap.innerHTML=list.map(r=>{
+    const hasObj=r.rMmt!==null||r.rRom!==null||r.rGrip!==null;
+    return`<div class="dr-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+        <div><span style="font-size:11px;font-weight:700;color:var(--text-sub)">${r.date}</span>${r.trainer?`<span style="font-size:10px;color:var(--text-hint);margin-left:6px">측정: ${r.trainer}</span>`:''}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${r.train>=0?`<span class="badge ${trainCls[r.train]}" style="font-size:10px">${trainLabel[r.train]}</span>`:''}
+          <span style="font-size:11px;color:var(--red);cursor:pointer;font-weight:600" onclick="deleteRecord('${r.id}')">삭제</span>
+        </div>
+      </div>
+      <div class="row3" style="margin-bottom:${(hasObj||r.note)?'9px':'0'}">
+        <div class="mc" style="padding:8px"><div class="ml">현재</div><div class="mv" style="font-size:17px;color:${pc(r.p1)}">${r.p1}</div></div>
+        <div class="mc" style="padding:8px"><div class="ml">훈련</div><div class="mv" style="font-size:17px;color:${pc(r.p2)}">${r.p2}</div></div>
+        <div class="mc" style="padding:8px"><div class="ml">휴식</div><div class="mv" style="font-size:17px;color:${pc(r.p3)}">${r.p3}</div></div>
+      </div>
+      ${r.note?`<div class="detail-note" style="margin-bottom:${hasObj?'8px':'0'}">${r.note}</div>`:''}
+      ${hasObj?`<div style="display:flex;justify-content:space-around;padding-top:8px;border-top:1px solid var(--border)">
+        ${r.rMmt!==null?`<span style="font-size:12px;color:var(--text-sub)">MMT <strong style="color:${cc(r.rMmt)}">${r.rMmt}%</strong></span>`:''}
+        ${r.rRom!==null?`<span style="font-size:12px;color:var(--text-sub)">ROM <strong style="color:${cc(r.rRom)}">${r.rRom}%</strong></span>`:''}
+        ${r.rGrip!==null?`<span style="font-size:12px;color:var(--text-sub)">악력 <strong style="color:${cc(r.rGrip)}">${r.rGrip}%</strong></span>`:''}
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+async function deleteRecord(id){
+  if(!confirm('이 보고 기록을 삭제할까요?')) return;
+  if(window.fbDeleteDoc) await window.fbDeleteDoc('dailyReports',id);
+  toast('보고 기록 삭제됐습니다');
+}
+function renderTrainers(){
+  const wrap=document.getElementById('trainer-list');
+  const list=getTrainers();
+  if(!list.length){wrap.innerHTML='<p style="font-size:12px;color:var(--text-hint)">등록된 트레이너가 없습니다</p>';return;}
+  wrap.innerHTML=list.map(t=>`<span class="trainer-chip">${t}<button onclick="removeTrainer('${t}')">×</button></span>`).join('');
+}
+async function addTrainer(){
+  const name=document.getElementById('trainer-input').value.trim();
+  if(!name){toast('이름을 입력해주세요');return;}
+  const list=getTrainers();
+  if(list.includes(name)){toast('이미 등록된 트레이너예요');return;}
+  if(window.fbSaveTrainers) await window.fbSaveTrainers([...list,name]);
+  document.getElementById('trainer-input').value=''; toast(name+' 트레이너 추가 완료');
+}
+async function removeTrainer(name){
+  const list=getTrainers().filter(t=>t!==name);
+  if(window.fbSaveTrainers) await window.fbSaveTrainers(list);
+  toast('트레이너가 삭제됐습니다');
+}
+document.getElementById('trainer-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTrainer()});
+function calcVerdict(boxId,titleId,descId,state){
+  const vb=document.getElementById(boxId);
+  if(!state.some(f=>f!=='')){vb.style.display='none';return;}
+  let title,desc,bg,color;
+  if(state[1]==='yes'){title='즉시 진료 필요';desc='레드플래그 해당 — 의료진 평가 우선';bg='#FEE2E2';color='#991B1B';}
+  else if(state[0]==='yes'){title='훈련 수정 필요';desc='부분 참여 권장 — 경과 관찰 필요';bg='#FFFBEB';color='#92400E';}
+  else if(state.some(f=>f==='hold')){title='판단 보류 항목 있음';desc='보류 항목 추가 확인 후 최종 결정 권장';bg='#F1F5F9';color='#475569';}
+  else{title='정상 훈련 가능';desc='현재 기준 훈련 참여 가능';bg='#DCFCE7';color='#166534';}
+  vb.style.display='block';vb.style.background=bg;vb.style.border='1px solid '+color+'55';
+  document.getElementById(titleId).style.color=color;document.getElementById(titleId).textContent=title;
+  document.getElementById(descId).style.color=color;document.getElementById(descId).textContent=desc;
+}
+function setFn(idx,val){
+  fnState[idx]=val;
+  ['y','n','h'].forEach(k=>{const el=document.getElementById('f'+idx+k);const t=k==='y'?'yes':k==='n'?'no':'hold';el.className='yb'+(val===t?' '+t:'')});
+  calcVerdict('reg-verdict','rv-t','rv-d',fnState);
+}
+function selArm(i){selArm_=i;[0,1].forEach(j=>document.getElementById('ab'+j).className='tb'+(j===i?' n':''))}
+function selRT(i){selRT_=i;[0,1,2].forEach(j=>document.getElementById('rt'+j).className='tb'+(j===i?' '+(j===0?'g':j===1?'y':'r'):''))}
+function goStep(n){
+  if(n===2&&!document.getElementById('s1-name').value.trim()){toast('선수명을 입력해주세요');return;}
+  [1,2].forEach(i=>document.getElementById('step'+i).style.display=i===n?'block':'none');
+}
+async function registerPlayer(){
+  const name=document.getElementById('s1-name').value.trim();
+  if(!name){toast('선수명을 입력해주세요');goStep(1);return;}
+  const isMedical=injType===1;
+  if(isMedical&&!document.getElementById('s2-msymptom').value){toast('증상을 선택해주세요');return;}
+  if(window.fbAddPlayer){
+    const pid=await window.fbAddPlayer({name,pos:document.getElementById('s1-pos').value,arm:selArm_===0?'우투':'좌투',height:document.getElementById('s1-h').value||'—',weight:document.getElementById('s1-w').value||'—',pinned:false});
+    const injData={pid,status:'active',injType:isMedical?'내과':'외상',
+      date:isMedical?document.getElementById('s2-mdate').value:document.getElementById('s2-date').value,
+      p1:document.getElementById('rp1').textContent,p2:document.getElementById('rp2').textContent,p3:document.getElementById('rp3').textContent,
+      trainStatus:selRT_,fnState:[...fnState]};
+    if(isMedical){injData.symptom=document.getElementById('s2-msymptom').value;injData.mdetail=document.getElementById('s2-mdetail').value;injData.area='내과';}
+    else{injData.area=document.getElementById('s2-area').value;injData.cause=document.getElementById('s2-cause').value;injData.detail=document.getElementById('s2-detail').value;}
+    await window.fbAddInjury(injData);
+  }
+  toast(name+' 선수 등록 완료');
+  document.getElementById('s1-name').value='';document.getElementById('s1-h').value='';document.getElementById('s1-w').value='';
+  document.getElementById('s2-detail').value='';document.getElementById('s2-mdetail').value='';
+  ['rp1','rp2','rp3'].forEach(id=>{const e=document.getElementById(id);e.textContent='0';e.style.color='var(--navy)'});
+  document.querySelectorAll('#step2 input[type=range]').forEach(r=>{r.value=0;r.style.setProperty('--val','0%')});
+  selArm_=0;selRT_=-1;fnState=['','','',''];injType=0;
+  [0,1].forEach(j=>document.getElementById('ab'+j).className='tb');
+  [0,1,2].forEach(j=>document.getElementById('rt'+j).className='tb');
+  [0,1].forEach(j=>document.getElementById('itype-'+j).className='tb'+(j===0?' n':''));
+  document.getElementById('trauma-fields').style.display='block';
+  document.getElementById('medical-fields').style.display='none';
+  for(let i=0;i<4;i++)['y','n','h'].forEach(k=>document.getElementById('f'+i+k).className='yb');
+  document.getElementById('reg-verdict').style.display='none';
+  goStep(1);switchTab('check');
+}
+// 초기 외상 선택
+selInjType(0);
+</script>
+</body>
+</html>
